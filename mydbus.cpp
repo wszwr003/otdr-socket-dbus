@@ -12,7 +12,7 @@ void sendsignal(char* sigvalue)
    int ret;
    dbus_uint32_t serial = 0;
 
-   printf("Sending signal with value %s\n", sigvalue);
+   printf("2.Sending signal: %s\n", sigvalue);
 
    // initialise the error value
    dbus_error_init(&err);
@@ -61,7 +61,7 @@ void sendsignal(char* sigvalue)
    }
    dbus_connection_flush(conn);
    
-   printf("Signal Sent\n");
+   printf("3.Signal Sent!\n");
    
    // free the message and close the connection
    dbus_message_unref(msg);
@@ -139,12 +139,12 @@ void receive(int * sock_desc)
 
          int slength = strlen(sigvalue);
          char buffer[slength];
-         printf("Got Signal with value as ASCII: %s,%d\n", sigvalue,slength);
+         printf("4.Got Signal as ASCII: %s,%d\n", sigvalue,slength);
          strcpy(buffer,sigvalue);
          if (slength > 0)
          {   
                buffer[slength] = '\0';
-               printf("Got Signal with value as HEX: ");
+               printf("4.Got Signal as HEX: ");
                for(int i=0; i<slength; ++i)
                   printf("%x,", (unsigned int)buffer[i]);
                printf("\n");           
@@ -372,6 +372,8 @@ void listen()
    // close the connection
    dbus_connection_close(conn);
 }
+
+
 
 // int main(int argc, char** argv)
 // {

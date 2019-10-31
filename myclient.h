@@ -10,7 +10,6 @@
 #include <unistd.h>
 #include <pthread.h>
 #include <stdio.h>
-#include "mydbus.h"
 
 #define VERSION "0.0.1"
 #define STAGE "alpha"
@@ -21,5 +20,8 @@
 
 void *connection_handler(void *threadid);
 void *thread_get(void *socket);
+void version(); //返回网络模块版本号
+//void set_server(); //设置服务器的ip地址，端口号
+//void connect_server() //连接到服务器
 
 #endif

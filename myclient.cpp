@@ -1,4 +1,6 @@
 #include "myclient.h"
+#include "mydbus.h"
+#include "ipv4.h"
 
 void *connection_handler(void *threadid)
 {
@@ -60,7 +62,7 @@ void *thread_get(void *socket)  //get
             printf("Error");
         else
         {
-            printf("<<<<<< get : ");
+            printf("1.Got socket: ");
             fputs(rbuff,stdout);
             printf("\n");
             sendsignal(rbuff);
@@ -71,11 +73,14 @@ void *thread_get(void *socket)  //get
     }
 }
 
+void version(){
+   sendsignal(VERSION);
+}
+
 int main()
 {
     setenv("DISPLAY",":0",true);
     pthread_t thread_a;
-
     if( pthread_create( &thread_a , NULL ,  connection_handler , (void*) 1) < 0)
     {
         perror("Could not create thread connection_handler!");
