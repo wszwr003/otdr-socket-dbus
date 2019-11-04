@@ -2,9 +2,10 @@
 #include "mydbus.h"
 #include "ipv4.h"
 
-void *connection_handler(void *threadid)
+void *connection_handler(void *arg)
 {
-    long threadnum = (long)threadid;
+    char ** dex = (char **) arg;
+    //printf("%s,%s\n",dex[1],dex[2]);
     int * sock_desc;
     struct sockaddr_in serv_addr;
     char sbuff[MAX_SIZE],rbuff[MAX_SIZE];
@@ -19,8 +20,8 @@ void *connection_handler(void *threadid)
     bzero((char *) &serv_addr, sizeof (serv_addr));
 
     serv_addr.sin_family = AF_INET;
-    serv_addr.sin_addr.s_addr = inet_addr(IP);
-    serv_addr.sin_port = htons(PORT);
+    serv_addr.sin_addr.s_addr = inet_addr(dex[1]);
+    serv_addr.sin_port = htons(atoi(dex[2]));
 
     if ((connect(* sock_desc, (struct sockaddr *) &serv_addr, sizeof (serv_addr))) < 0) {
         printf("Failed to connect to server!\n");
@@ -77,11 +78,18 @@ void version(){
    sendsignal(VERSION);
 }
 
-int main()
+int main(int argc, char** argv)
 {
+    if (argc != 3)
+    {
+        fprintf(stderr, "Usage: client <host> <port>\n");
+        exit(1);
+    }
+    //system("export $(dbus-launch)"); 
     setenv("DISPLAY",":0",true);
+
     pthread_t thread_a;
-    if( pthread_create( &thread_a , NULL ,  connection_handler , (void*) 1) < 0)
+    if( pthread_create( &thread_a , NULL ,  connection_handler , (void*) argv))
     {
         perror("Could not create thread connection_handler!");
         return 1;

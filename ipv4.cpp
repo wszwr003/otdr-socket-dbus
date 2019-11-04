@@ -4,7 +4,7 @@ void set_localhost(const char * ip,const char * gw,const char * netmask)
 {
 	char cmd[128];
 	//network interface
-	char nwkInf[7]="eth1:0";
+	char nwkInf[7]="eth0";
 
 	//link down command in Linux
 	sprintf(cmd,"ip link set %s down",nwkInf);

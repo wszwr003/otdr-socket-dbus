@@ -12,7 +12,7 @@ void sendsignal(char* sigvalue)
    int ret;
    dbus_uint32_t serial = 0;
 
-   printf("2.Sending signal: %s\n", sigvalue);
+   printf("Sending signal: %s\n", sigvalue);
 
    // initialise the error value
    dbus_error_init(&err);
@@ -28,7 +28,7 @@ void sendsignal(char* sigvalue)
    }
 
    // register our name on the bus, and check for errors
-   ret = dbus_bus_request_name(conn, "test.signal.source", DBUS_NAME_FLAG_REPLACE_EXISTING , &err);
+   ret = dbus_bus_request_name(conn, SEND_SIGNAL_DBUS_NAME, DBUS_NAME_FLAG_REPLACE_EXISTING , &err);
    if (dbus_error_is_set(&err)) { 
       fprintf(stderr, "Name Error (%s)\n", err.message); 
       dbus_error_free(&err); 
@@ -38,9 +38,9 @@ void sendsignal(char* sigvalue)
    }
 
    // create a signal & check for errors 
-   msg = dbus_message_new_signal("/test/signal/Object", // object name of the signal
-                                 "test.signal.Type", // interface name of the signal
-                                 "Test"); // name of the signal
+   msg = dbus_message_new_signal(SEND_SIGNAL_PATH_NAME, // object name of the signal
+                                 SEND_SIGNAL_INTERFACE_NAME, // interface name of the signal
+                                 SEND_SIGNAL_NAME); // name of the signal
    if (NULL == msg) 
    { 
       fprintf(stderr, "Message Null\n"); 
@@ -61,7 +61,7 @@ void sendsignal(char* sigvalue)
    }
    dbus_connection_flush(conn);
    
-   printf("3.Signal Sent!\n");
+   printf("Signal Sent!\n");
    
    // free the message and close the connection
    dbus_message_unref(msg);
@@ -96,7 +96,7 @@ void receive(int * sock_desc)
    }
    
    // request our name on the bus and check for errors
-   ret = dbus_bus_request_name(conn, "test.signal.sink", DBUS_NAME_FLAG_REPLACE_EXISTING , &err);
+   ret = dbus_bus_request_name(conn, GET_SIGNAL_DBUS_NAME, DBUS_NAME_FLAG_REPLACE_EXISTING , &err);
    if (dbus_error_is_set(&err)) { 
       fprintf(stderr, "Name Error (%s)\n", err.message);
       dbus_error_free(&err); 
@@ -106,7 +106,9 @@ void receive(int * sock_desc)
    }
 
    // add a rule for which messages we want to see
-   dbus_bus_add_match(conn, "type='signal',interface='test.signal.Type'", &err); // see signals from the given interface
+   char string[50];
+   sprintf(string, "%s%s%s", "type='signal',interface='", GET_SIGNAL_INTERFACE_NAME,"'");
+   dbus_bus_add_match(conn,string, &err); // see signals from the given interface
    dbus_connection_flush(conn);
    if (dbus_error_is_set(&err)) { 
       fprintf(stderr, "Match Error (%s)\n", err.message);
@@ -127,7 +129,7 @@ void receive(int * sock_desc)
       }
 
       // check if the message is a signal from the correct interface and with the correct name
-      if (dbus_message_is_signal(msg, "test.signal.Type", "Test")) {
+      if (dbus_message_is_signal(msg, GET_SIGNAL_INTERFACE_NAME, GET_SIGNAL_NAME)) {
          
          // read the parameters
          if (!dbus_message_iter_init(msg, &args))
@@ -139,12 +141,12 @@ void receive(int * sock_desc)
 
          int slength = strlen(sigvalue);
          char buffer[slength];
-         printf("4.Got Signal as ASCII: %s,%d\n", sigvalue,slength);
+         printf("Got Signal as ASCII: %s,%d\n", sigvalue,slength);
          strcpy(buffer,sigvalue);
          if (slength > 0)
          {   
                buffer[slength] = '\0';
-               printf("4.Got Signal as HEX: ");
+               printf("Got Signal as HEX: ");
                for(int i=0; i<slength; ++i)
                   printf("%x,", (unsigned int)buffer[i]);
                printf("\n");           
