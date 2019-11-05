@@ -3,7 +3,7 @@
 /**
  * Connect to the DBUS bus and send a broadcast signal
  */
-void sendsignal(char *sigvalue)
+void sendsignal(unsigned char *sigvalue,int len)
 {
    DBusMessage *msg;
    DBusMessageIter args;
@@ -12,8 +12,8 @@ void sendsignal(char *sigvalue)
    int ret;
    dbus_uint32_t serial = 0;
 
-   printf("Sending signal: %s\n", sigvalue);
-
+   char *tmp = (char*)calloc(2*len+1,sizeof(char));            
+   byte2chars(sigvalue,len,tmp);
    // initialise the error value
    dbus_error_init(&err);
 
@@ -53,8 +53,9 @@ void sendsignal(char *sigvalue)
 
    // append arguments onto signal
    dbus_message_iter_init_append(msg, &args);
-   if (!dbus_message_iter_append_basic(&args, DBUS_TYPE_STRING, &sigvalue))
+   if (!dbus_message_iter_append_basic(&args, DBUS_TYPE_STRING, &tmp))
    {
+      free(tmp);
       fprintf(stderr, "Out Of Memory!\n");
       exit(1);
    }
@@ -71,6 +72,7 @@ void sendsignal(char *sigvalue)
 
    // free the message and close the connection
    dbus_message_unref(msg);
+   free(tmp);
    dbus_connection_close(conn);
 }
 
@@ -154,7 +156,6 @@ void receive(int *sock_desc)
             dbus_message_iter_get_basic(&args, &sigvalue);
 
          int slength = strlen(sigvalue);
-
          unsigned char *re = (unsigned char*)calloc(slength/2+1,sizeof(unsigned char));
          chars2byte(sigvalue,re);
 
@@ -167,6 +168,7 @@ void receive(int *sock_desc)
             printf("\n");
          }
          send(*sock_desc, re, slength/2, 0);
+         free(re);
       }
 
       // free the message

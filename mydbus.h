@@ -25,12 +25,11 @@
 #define METHOD_SEND_NAME "otdr.method.send"
 #define METHOD_GET_NAME "otdr.method.get"
 
-void sendsignal(char* sigvalue);
+void sendsignal(unsigned char* sigvalue,int len);
 void query(char* param);
 void reply_to_method_call(DBusMessage* msg, DBusConnection* conn);
 void listen();
 void receive(int* socket);
-
 void byte2chars(unsigned char *rbuf,int len,char * re);
 void chars2byte(const char *rbuf,unsigned char* re);
 

@@ -13,12 +13,10 @@ void *connection_handler(void *arg)
     sock_desc = (int*)malloc(sizeof(int));
     if((* sock_desc = socket(AF_INET, SOCK_STREAM, 0)) < 0)
     {
-        printf("Failed creating socket\n");
+        printf("Failed creating socket\n");  //FIXME: 连接失败后不挑出，也不重连
         //return -1;
     }     
-
     bzero((char *) &serv_addr, sizeof (serv_addr));
-
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_addr.s_addr = inet_addr(dex[1]);
     serv_addr.sin_port = htons(atoi(dex[2]));
@@ -36,19 +34,9 @@ void *connection_handler(void *arg)
     }
     
     sleep(1);
-
     receive(sock_desc);
-    // while(1) //send
-    // {
-    //     //printf("======For thread send: %ld ======\n", threadnum);
-    //     //printf("please input send msg:");
-    //     fgets(sbuff, MAX_SIZE , stdin);
-    //     send(*sock_desc,sbuff,strlen(sbuff),0);
-    //     printf(">>>>>> sended : %s ",sbuff);
-    //     //printf("======Thread send end : %ld ======\n\n", threadnum);
-    //     sleep(1);
-    // }
     close(*sock_desc);
+    free(sock_desc);
     return 0;
 }
 
@@ -64,29 +52,16 @@ void *thread_get(void *socket)  //get
             printf("Error");
         else
         {
-            // printf("Got socket: ");
-            // fputs(rbuff,stdout);
+            // char *tmp = (char*)calloc(2*recv_size+1,sizeof(char));            
+            // byte2chars(rbuff,recv_size,tmp);
+            // printf("strlen: %d,%d\n",recv_size,strlen(tmp));
+            // printf("byte2chars bytes output:");
+            // for(int i=0;i<strlen(tmp);i++){
+            //     printf("0x%02x,",(unsigned int)(*(tmp+i)));
+            // }
             // printf("\n");
-            char *tmp = (char*)calloc(2*recv_size+1,sizeof(char));            
-            byte2chars(rbuff,recv_size,tmp);
-            printf("strlen: %d,%d\n",recv_size,strlen(tmp));
-            printf("byte2chars bytes output:");
-            for(int i=0;i<strlen(tmp);i++){
-                printf("0x%02x,",(unsigned int)(*(tmp+i)));
-            }
-            printf("\n");
-            sendsignal(tmp);
-
-            //unsigned char *re = (unsigned char*)calloc(recv_size+1,sizeof(unsigned char));
-            //chars2byte(tmp,re);
-            //printf("strlen: %d\n",strlen((char *)re));
-            //printf("chars2byte bytes output:");
-            //for(int i=0;i<recv_size;i++){
-            //    printf("0x%02x,",(unsigned int)(*(re+i)));
-            //}
-            //printf("\n");
-
-            
+            sendsignal(rbuff,recv_size);
+            //free(tmp);
         }   
         bzero(rbuff,MAX_SIZE);
         //printf("======Thread get end ======\n\n");
@@ -95,7 +70,7 @@ void *thread_get(void *socket)  //get
 }
 
 void version(){
-   sendsignal(VERSION);
+   //sendsignal(VERSION,1);
 }
 
 int main(int argc, char** argv)

@@ -16,7 +16,7 @@
 #define LAST_EDIT_TIME "2019.10.31"
 #define IP "192.168.22.130"
 #define PORT 8888
-#define MAX_SIZE 2048
+#define MAX_SIZE 1024
 
 void *connection_handler(void *threadid);
 void *thread_get(void *socket);
