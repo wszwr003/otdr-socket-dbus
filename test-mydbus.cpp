@@ -1,5 +1,4 @@
-#include "mydbus.h"
-
+#include "test-mydbus.h"
 /**
  * Connect to the DBUS bus and send a broadcast signal
  */

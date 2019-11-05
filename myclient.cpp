@@ -54,19 +54,39 @@ void *connection_handler(void *arg)
 
 void *thread_get(void *socket)  //get
 {
-    char rbuff[MAX_SIZE];
+    unsigned char rbuff[MAX_SIZE];
     int sock_desc = *((int *)socket);
+    int recv_size;
     while(1) //get
     {
         //printf("======For thread get ======\n");
-        if(recv(sock_desc,rbuff,MAX_SIZE,0)==0)
+        if((recv_size=recv(sock_desc,rbuff,MAX_SIZE,0))==0)
             printf("Error");
         else
         {
-            printf("1.Got socket: ");
-            fputs(rbuff,stdout);
+            // printf("Got socket: ");
+            // fputs(rbuff,stdout);
+            // printf("\n");
+            char *tmp = (char*)calloc(2*recv_size+1,sizeof(char));            
+            byte2chars(rbuff,recv_size,tmp);
+            printf("strlen: %d,%d\n",recv_size,strlen(tmp));
+            printf("byte2chars bytes output:");
+            for(int i=0;i<strlen(tmp);i++){
+                printf("0x%02x,",(unsigned int)(*(tmp+i)));
+            }
             printf("\n");
-            sendsignal(rbuff);
+            sendsignal(tmp);
+
+            //unsigned char *re = (unsigned char*)calloc(recv_size+1,sizeof(unsigned char));
+            //chars2byte(tmp,re);
+            //printf("strlen: %d\n",strlen((char *)re));
+            //printf("chars2byte bytes output:");
+            //for(int i=0;i<recv_size;i++){
+            //    printf("0x%02x,",(unsigned int)(*(re+i)));
+            //}
+            //printf("\n");
+
+            
         }   
         bzero(rbuff,MAX_SIZE);
         //printf("======Thread get end ======\n\n");
