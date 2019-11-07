@@ -119,7 +119,7 @@ void receive(int *sock_desc)
 
    // add a rule for which messages we want to see
    char string[50];
-   sprintf(string, "%s%s%s", "type='signal',interface='", SEND_SIGNAL_INTERFACE_NAME, "'");
+   sprintf(string, "%s%s%s", "type='signal',interface='",GET_SIGNAL_INTERFACE_NAME, "'");
    dbus_bus_add_match(conn, string, &err); // see signals from the given interface
    dbus_connection_flush(conn);
    if (dbus_error_is_set(&err))
@@ -144,7 +144,7 @@ void receive(int *sock_desc)
       }
 
       // check if the message is a signal from the correct interface and with the correct name
-      if (dbus_message_is_signal(msg, SEND_SIGNAL_INTERFACE_NAME, SEND_SIGNAL_NAME))
+      if (dbus_message_is_signal(msg, GET_SIGNAL_INTERFACE_NAME, GET_SIGNAL_NAME))
       {
 
          // read the parameters
