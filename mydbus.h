@@ -9,6 +9,7 @@
 #include <string.h>
 #include <iostream>
 #include <sys/socket.h>
+#include <sys/time.h>
 
 #define OTDR_SEND_SIGNAL_DBUS_NAME "get.signal.otdr"
 #define GET_SIGNAL_DBUS_NAME "get.signal.middle"

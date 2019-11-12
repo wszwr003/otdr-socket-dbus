@@ -12,8 +12,10 @@ void sendsignal(unsigned char *sigvalue,int len)
    int ret;
    dbus_uint32_t serial = 0;
 
-   char *tmp = (char*)calloc(2*len+1,sizeof(char));            
+   char *tmp = (char*)calloc(2*len+1,sizeof(char));   
+
    byte2chars(sigvalue,len,tmp);
+
    // initialise the error value
    dbus_error_init(&err);
 
@@ -53,6 +55,7 @@ void sendsignal(unsigned char *sigvalue,int len)
 
    // append arguments onto signal
    dbus_message_iter_init_append(msg, &args);
+
    if (!dbus_message_iter_append_basic(&args, DBUS_TYPE_STRING, &tmp))
    {
       free(tmp);
@@ -133,13 +136,14 @@ void receive(int *sock_desc)
    {
 
       // non blocking read of the next available message
+  
       dbus_connection_read_write(conn, 0);
       msg = dbus_connection_pop_message(conn);
 
       // loop again if we haven't read a message
       if (NULL == msg)
       {
-         sleep(1);
+         //sleep(1);
          continue;
       }
 
@@ -157,18 +161,27 @@ void receive(int *sock_desc)
 
          int slength = strlen(sigvalue);
          unsigned char *re = (unsigned char*)calloc(slength/2+1,sizeof(unsigned char));
+
          chars2byte(sigvalue,re);
 
          //printf("Got Signal as ASCII: %s,%d\n", re, slength/2);
-         if (slength/2 > 0)
-         {
-            printf("Got Signal as HEX: ");
-            for (int i = 0; i < slength/2; ++i)
-               printf("0X%02x,", (unsigned int)(*(re+i)));
-            printf("\n");
-         }
+         // if (slength/2 > 0)
+         // {
+         //    printf("Got Signal as HEX: ");
+         //    for (int i = 0; i < slength/2; ++i)
+         //       printf("0X%02x,", (unsigned int)(*(re+i)));
+         //    printf("\n");
+         // }
+
          send(*sock_desc, re, slength/2, 0);
          free(re);
+
+         printf("Signal Got!\n");
+
+         //struct timeval tv;
+         //gettimeofday(&tv,NULL);
+         //printf("<-millisecond get:%ld\n",tv.tv_sec*1000 + tv.tv_usec/1000); 
+
       }
 
       // free the message

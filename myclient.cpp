@@ -60,12 +60,17 @@ void *thread_get(void *socket)  //get
             //     printf("0x%02x,",(unsigned int)(*(tmp+i)));
             // }
             // printf("\n");
+
+            //struct timeval tv;
+            //gettimeofday(&tv,NULL);
+            //printf("->millisecond send:%ld\n",tv.tv_sec*1000 + tv.tv_usec/1000); 
+
             sendsignal(rbuff,recv_size);
+
             //free(tmp);
         }   
         bzero(rbuff,MAX_SIZE);
         //printf("======Thread get end ======\n\n");
-        sleep(1);
     }
 }
 
